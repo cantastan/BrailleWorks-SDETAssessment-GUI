@@ -1,0 +1,140 @@
+Create a cucumber BDD Maven POM framework
+add brailleWorks package under test.java
+    add gui package under test.java.brailleWorks
+        add pages package
+        add runners package
+        add step_definitions package
+        add utilities package
+add resources folder under test package
+create configuration.properties file on Project level BrailleWorks-SDETAssessment-GUI
+    add browser=edge (browser preference can run whichever) dynamically can be changed here
+    add sdetAssessmenturl=http://localhost:8080/ (this is host url)
+add dependencies to pom.xml
+    selenium-java ver 4.12.1
+    cucumber-junit ver 7.3.2
+    cucumber-java ver 7.3.2
+    cucumber reporting plugin ver 7.3.0
+Create configurationreader class under utilities (this will read the configuration.properties file)
+    add private static Properties object
+    add a try catch and surround with static block (this is basic configuration property key=value reader)
+        inside try {
+                    FileInputStream file = new FileInputStream("configuration.properties");
+                    properties.load(file);
+                    file.close();
+        inside catch} catch (IOException e) {
+                    System.out.println("FILE NOT FOUND WITH GIVEN PATH!!!");
+                    e.printStackTrace();
+                    }
+Create BrowserUtilities class under utilities package add dynamic code as needed
+Create Driver class under utilities package
+    create a private constructor of class
+    create a threadlocal variable to store WebDriver instances
+        name is driverPool or drivers or something unique referring to a group or more than 1 of drivers
+    create a singelton driver method which will receive the singleton instance of a Webdriver
+        add if statement for whether driver is null
+            if null then driver will run depending on browser=value selection in configuration.properties file
+                if statement to read browser type from configuration.properties file
+                switch statement to select the correct browser if browser is null in previous if statement
+        if not null then Driver returns the current instance and continues running
+    create closeDriver method
+        this will check if there is a driver open not null
+        then quit the webdriver instance
+        then remove the webdriver insstance from the thread local variable driverPool we created
+create CukesRunner class or MainRunner or whatever is unique to project/company/team for class name under runners package
+    create junit tags
+        @RunWith(Cucumber.class)
+        @CucumberOptions(
+        plugin = {
+                 "html:target/cucumber-reports.html", // will create cucumber report passed/failed
+                 "rerun:target/rerun.txt", // this is great--> if a test fails a report of the test will be stored into this .txt file which can be run separately later
+                 "me.jvt.cucumber.report.PrettyReports:target/cucumber", // will create a fancy readable cucumber report
+                 "json:target/cucumber.json" // will create a json report of testcases/framework if you need (not really necessary)
+                },
+                features = "src/test/resources/features", // will let the runner know where to read feature files from
+                glue = "brailleWorks/gui/step_definitions", // will target the test cases package
+                dryRun = false, // will only run to make sure all the step definitions are created if "true" great for snippets
+                tags = "@smoke", //will only execute whatever has the @regression tag can be used to execute any tag like @librarian or @brailleWorks
+                // tags = "@brailleWorks or @admin" will run all tags that are either of these --> or is keyword here
+                // tags = "@smoke and @developer" will ONLY run tags that have both --> and is keyword here
+                // tags = "@smoke and not @developer" will run all @smoke unless there is @developer with it
+                publish = true // will create a report link if true
+Create FailedTestRunner class under runners package
+    create junit tags
+    @RunWith(Cucumber.class)
+    @CucumberOptions(
+            features = "@target/rerun.txt", // will let the runner know where to read rerun.txt files from
+            glue = "brailleWorks/gui/step_definitions" //after reading rerun if any failed tests will compare and execute from step_definitions class
+    )
+
+After manually interacting with Host URL or in real world getting user story from Jira xray and applying it to feature file
+When you make it to the feature file step you should already have your test cases created on jira so you can start implementing them into your framework
+i like to create test cases based on user story and manually test one by one while taking screenshots of my actions ( this saves so much time when in test execution stage )
+and allows you to write more accurate "live" test cases theres just less room for error or rewriting later on.
+
+create a feature file under features package make sure to give unique name based on user story and DO NOT forget to add .feature after name when saving
+    add feature file sdetAssessmentHome.feature
+        create @smoke annotation so your runner knows which feature file to run
+        KEEP IN MINE FEATURE FILES ARE CASE SENSITIVE
+        Be careful if you are repeating Scenario steps just use a background pre condition to run before all the feature files in that one file ONLY
+        control + ALT + L will beautify/organize your file for better view
+        -add Feature: Title
+            -add Agile Story ( from JIRA )
+        -add background if needed this will run for every Scenario
+            create gherkin cucumber style Scenario
+            Given, And, Then, But, When ect...
+            you should copy your test cases and write your test cases in this behavior
+Create SDET_AssessmentHomePage class
+    add all your locaters needed to satisfy user story and test cases
+Create AboutLinkRedirectHomePage class
+    add all your locaters needed to satisfy user story and test cases
+Run YOUR CUKES RUNNER WITH DRY RUN = TRUE to obtain snippets DONT forget to swtich it back
+Create SDET_AssessmentStepDef Class
+    COPY the snippets in the IDE console and paste to step def
+        REMOVE all unnecessary code like exceptions or comments and duplicate steps
+    Create the objects of the page class so you can access the locaters
+    add necessary code to verify user story/test cases/ bugs
+
+create a feature file under features package make sure to give unique name based on user story and DO NOT forget to add .feature after name when saving
+    add feature file sdetAssessmentCounter.feature
+        create @smoke annotation so your runner knows which feature file to run
+        KEEP IN MINE FEATURE FILES ARE CASE SENSITIVE
+        Be careful if you are repeating Scenario steps just use a background pre condition to run before all the feature files in that one file ONLY
+        control + ALT + L will beautify/organize your file for better view
+        -add Feature: Title
+            -add Agile Story ( from JIRA )
+        -add background if needed this will run for every Scenario
+            create gherkin cucumber style Scenario
+            Given, And, Then, But, When ect...
+            you should copy your test cases and write your test cases in this behavior
+Create SDET_AssessmentCounter class
+    add all your locaters needed to satisfy user story and test cases
+Run YOUR CUKES RUNNER WITH DRY RUN = TRUE to obtain snippets DONT forget to swtich it back
+Create SDET_AssessmentCounterStepDef Class
+    COPY the snippets in the IDE console and paste to step def
+        REMOVE all unnecessary code like exceptions or comments and duplicate steps
+    Create the object/constructor of the page class so you can access the locaters
+    add necessary code to verify user story/test cases/ bugs
+
+create a feature file under features package make sure to give unique name based on user story and DO NOT forget to add .feature after name when saving
+    add feature file sdetAssessmentWeather.feature
+        create @smoke annotation so your runner knows which feature file to run
+        KEEP IN MINE FEATURE FILES ARE CASE SENSITIVE
+        Be careful if you are repeating Scenario steps just use a background pre condition to run before all the feature files in that one file ONLY
+        control + ALT + L will beautify/organize your file for better view
+        -add Feature: Title
+            -add Agile Story ( from JIRA )
+        -add background if needed this will run for every Scenario
+            create gherkin cucumber style Scenario
+            Given, And, Then, But, When ect...
+            you should copy your test cases and write your test cases in this behavior
+Create SDET_AssessmentWeather class
+    add all your locaters needed to satisfy user story and test cases
+Run YOUR CUKES RUNNER WITH DRY RUN = TRUE to obtain snippets DONT forget to swtich it back
+Create SDET_AssessmentWeatherStepDef Class
+    COPY the snippets in the IDE console and paste to step def
+        REMOVE all unnecessary code like exceptions or comments and duplicate steps
+    Create the object/constructor of the page class so you can access the locaters
+    add necessary code to verify user story/test cases/ bugs
+        create a seperate fileInput Webelement locating the inputFile button
+            add a string variable to store your file path (absolute path)
+            using sendKeys() method input fileInput.sendKeys(filePath)
